@@ -1,14 +1,14 @@
-#include "VKUsersRelation.h"
-#include "sha1.h"
+#include "VKGraph.h"
 
 
 char menu() {
 	std::string choose;
 
 	cout << "\n1. Download VK User information" << endl
-		 << "2. Show VK Account changes" << endl
-		 << "3. Show VK Users activity" << endl
-		 << "4. Exit program" << endl
+		 << "2. Show VK Account changes"        << endl
+		 << "3. Show VK Users activity"         << endl
+		 << "4. Get VK social graph"            << endl
+		 << "5. Exit program"                   << endl
 		 << "\nChoose option: ";
 
 	std::getline(cin, choose);
@@ -129,7 +129,15 @@ void createDirectory() {
 	SYSTEMTIME time;
 	GetLocalTime(&time);
 
-	std::string command = "md ..\\userdata\\" + std::to_string(time.wDay) + '.' + std::to_string(time.wMonth) + '.' + std::to_string(time.wYear);
+	std::stringstream stream;
+	stream << std::setw(2) << std::right << std::setfill('0') << std::to_string(time.wDay)   << '.'
+		   << std::setw(2) << std::right << std::setfill('0') << std::to_string(time.wMonth) << '.'
+		   << std::setw(2) << std::right << std::setfill('0') << std::to_string(time.wYear);
+
+	std::string foulder;
+	stream >> foulder;
+
+	std::string command = "md ..\\userdata\\" + foulder;
 
 	system(command.c_str());
 }
@@ -138,96 +146,57 @@ void createDirectory() {
 
 
 void userAuth() {
-	std::string login;
-
-	cout << "\nEnter login: ";
-	std::getline(cin, login);
-
-	std::string pass;
-
-	cout << "Enter password: ";
-	std::getline(cin, pass);
-
-	SHA1 encrypt;
-
-	encrypt.update(login);
-	std::string login_hash = encrypt.final();
-
-	encrypt.update(pass);
-	std::string pass_hash = encrypt.final();
-
 	std::string token;
-	std::ifstream fin(std::string("..\\userdata\\auth\\" + login_hash + "\\" + pass_hash + ".txt"));
 
-	if (!fin.is_open()) {
-		std::string command = "md ..\\userdata\\auth\\" + login_hash;
-		system(command.c_str());
+	cout << "Enter token: ";
+	std::getline(cin, token);
 
-		std::ofstream fout(std::string("..\\userdata\\auth\\" + login_hash + "\\" + pass_hash + ".txt"));
-
-		cout << "Enter token: ";
-		std::getline(cin, token);
-
-		fout << token;
-		fout.close();
-	}
-
-	fin >> token;
-	fin.close();
+	std::fstream file("..\\token\\token.txt");
+	file << token;
+	file.close();
 
 	VK::Client user;
-
-	user.setLogin(login);
-	user.setPass(pass);
 	user.setToken(token);
 
 	VK::VKUsersRelation vk_user;
 	vk_user.setToken(token);
 
-	if (!user.auth()) {
-		std::string path = "..\\userdata\\auth\\" + login_hash;
-		system(std::string("DEL " + path + "\\" + pass_hash + ".txt").c_str());
-		system(std::string("RD " + path).c_str());
-		
-		throw std::exception("authorization error");
-	}
+	if (!user.auth()) throw std::exception("authorization error");
 }
 
 
 void defaultAuth() {
-	std::string login = "89999651091";
-	std::string pass = "Farantop1488";
-
-	SHA1 encrypt;
-
-	encrypt.update(login);
-	std::string login_hash = encrypt.final();
-
-	encrypt.update(pass);
-	std::string pass_hash = encrypt.final();
-
 	std::string token;
 
-	std::ifstream fin(std::string("..\\userdata\\auth\\" + login_hash + "\\" + pass_hash + ".txt"));
+	std::ifstream fin("..\\token\\token.txt");
 	fin >> token;
 	fin.close();
 
-	VK::Client user;
+	if (token.empty()) {
+		cout << "\nNo default token\n"
+		     << "Enter new token: ";
+		std::getline(cin, token);
+	}
 
-	user.setLogin(login);
-	user.setPass(pass);
+	VK::Client user;
 	user.setToken(token);
 
 	VK::VKUsersRelation vk_user;
 	vk_user.setToken(token);
+
+	if (!user.auth()) throw std::exception("authorization error");
+	
+	std::ofstream fout("..\\token\\token.txt");
+	fout << token;
+	fout.close();
 }
 
 
 bool programAuth() {
 	std::string option;
 
-	cout << "1. Log in\n"
-		 << "2. Use default token\n"
+	cout << "1. User token\n"
+		 << "2. Default token\n"
 		 << "\nChoose option: ";
 
 	std::getline(cin, option);
@@ -250,4 +219,18 @@ bool programAuth() {
 		std::cerr << "Error: " << e.what() << endl;
 		return false;
 	}
+}
+
+
+void getSocialGraph() {
+	std::string domain, foulder;
+
+	cout << "Print domain: ";
+	std::getline(cin, domain);
+
+	cout << "Print graph name: ";
+	std::getline(cin, foulder);
+
+	VK::VKGraph api(domain);
+	api.getGraph(foulder, foulder);
 }
