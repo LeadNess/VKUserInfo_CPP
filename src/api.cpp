@@ -17,8 +17,7 @@ string VK::Client::token;
 string VK::Client::api_url = "https://api.vk.com/method/";
 string VK::Client::auth_url = "https://oauth.vk.com/token?";
 wstring VK::Client::wtoken;
-//fb59703b5c14638140232cacd1b54754a42381e32e9cc5419f0d02f761f0c6e627430952657e471980642
-//ac1fb088f70cfa9ddfbdf3b251b04d512c5541ac18ac0f81e8b8e2f0eb41f4fa275997224f7802e2bee13
+
 
 VK::Client::Client(const std::string _version,
 	const std::string _lang,

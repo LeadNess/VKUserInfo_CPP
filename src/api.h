@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include <vector>
 #include <codecvt>
-
 #include <cpr/cpr.h>
 #include <curl/curl.h>
 
@@ -60,7 +59,7 @@ namespace VK {
 	public:
 
 		Client(const std::string _version = "5.65",
-			const std::string _lang = "ru",
+			const std::string _lang = "eu",
 			const callback_func_cap cap_callback = nullptr,
 			const callback_func_fa2 _fa2_callback = nullptr);
 
