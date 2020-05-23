@@ -33,6 +33,7 @@ namespace VK {
 		static std::string auth_url;
 		static std::string api_url;
 		static std::wstring wtoken;
+		static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>
 
 		std::string a_t;
 		std::string captcha_sid;

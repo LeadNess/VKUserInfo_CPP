@@ -3,12 +3,9 @@
 #include "api.h"
 
 
-std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
-
-
-using ::std::string;
-using ::std::wstring;
-using json = ::nlohmann::json;
+using std::string;
+using std::wstring;
+using json = nlohmann::json;
 
 
 string VK::Client::login;
@@ -17,6 +14,7 @@ string VK::Client::token;
 string VK::Client::api_url = "https://api.vk.com/method/";
 string VK::Client::auth_url = "https://oauth.vk.com/token?";
 wstring VK::Client::wtoken;
+std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> VK::Client::conv;
 
 
 VK::Client::Client(const std::string _version,
@@ -78,6 +76,7 @@ void VK::Client::setPass(const string& pass) {
 
 void VK::Client::setToken(const string& token) {
 	this->token = token;
+	VK::Client
 	this->wtoken = conv.from_bytes(token);
 }
 
@@ -275,7 +274,7 @@ string VK::Utils::data2str(const params_map &data) {
 
 int VK::Utils::CURL_WRITER(char *data, size_t size, size_t nmemb, string *buffer) {
 	int result = 0;
-	if (buffer != NULL) {
+	if (buffer != nullptr) {
 		buffer->append(data, size * nmemb);
 		result = size * nmemb;
 	}
@@ -302,12 +301,9 @@ string VK::Client::request(const string &url, const string &data) {
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &curl_buffer);
 		result = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
-		if (result == CURLE_OK)
-		{
+		if (result == CURLE_OK) {
 			return curl_buffer;
-		}
-		else
-		{
+		} else {
 			return errorBuffer;
 		}
 	}
@@ -315,7 +311,3 @@ string VK::Client::request(const string &url, const string &data) {
 
 	return "";
 }
-
-
-
-
